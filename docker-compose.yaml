@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  cassandra:
+    image: cassandra:latest
+    container_name: my-cassandra
+    ports:
+      - "9042:9042"  # CQL native transport port
+    environment:
+      - CASSANDRA_START_RPC=true
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_ENDPOINT_SNITCH=SimpleSnitch
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    networks:
+      - cassandra-net
+
+  cassandra-init:
+    image: cassandra:latest
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    command: >
+      bash -c "
+        echo 'Waiting for Cassandra to be ready...' &&
+        echo '
+        -- Create keyspace
+        CREATE KEYSPACE IF NOT EXISTS my_keyspace 
+        WITH REPLICATION = { 
+           \"class\" : \"SimpleStrategy\", 
+           \"replication_factor\" : 1 
+        };
+
+        -- Use the keyspace
+        USE my_keyspace;
+
+        -- Create a sample table (you can modify this based on your needs)
+        CREATE TABLE IF NOT EXISTS users (
+           user_id UUID PRIMARY KEY,
+           username TEXT,
+           email TEXT,
+           created_at TIMESTAMP
+        );
+        ' > /tmp/init-keyspace.cql &&
+        cqlsh cassandra -f /tmp/init-keyspace.cql &&
+        echo 'Initialization complete'
+      "
+    networks:
+      - cassandra-net
+
+networks:
+  cassandra-net:
+    driver: bridge
+
+volumes:
+  cassandra-data:

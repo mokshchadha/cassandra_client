@@ -1,0 +1,8 @@
+output: 'lib/src/generated_bindings.dart'
+headers:
+  entry-points:
+    - '/opt/homebrew/include/cassandra.h'  # For Apple Silicon
+  include-directives:
+    - '/opt/homebrew/include/cassandra.h'  # For Apple Silicon
+name: 'CassandraBindings'
+description: 'Bindings for the Cassandra C/C++ driver'

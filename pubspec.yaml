@@ -8,8 +8,36 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  # path: ^1.8.0
+  ffi: ^2.1.3
+  path: ^1.8.0
+  ffigen: ^18.0.0
 
 dev_dependencies:
   lints: ^3.0.0
   test: ^1.24.0
+
+# ffigen configuration with correct path
+ffigen:
+  name: 'CassandraBindings'
+  description: 'Bindings for the Cassandra C/C++ library'
+  output: 'lib/src/cassandra_bindings.dart'
+  headers:
+    entry-points:
+      - '/opt/homebrew/include/cassandra.h'
+  comments:
+    style: any
+  structs:
+    member-rename:
+      '.*':
+        '.*': camelCase
+  macros:
+    rename:
+      '.*': camelCase
+  globals:
+    rename:
+      '.*': camelCase
+  functions:
+    rename:
+      '.*': camelCase
+    exclude:
+      - '.*_deprecated.*'
