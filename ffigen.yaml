@@ -1,8 +1,18 @@
-output: 'lib/src/generated_bindings.dart'
+output: 'lib/src/cassandra_bindings.dart'
 headers:
   entry-points:
-    - '/opt/homebrew/include/cassandra.h'  # For Apple Silicon
+    - '/opt/homebrew/include/cassandra.h'  # Adjust path as needed
   include-directives:
-    - '/opt/homebrew/include/cassandra.h'  # For Apple Silicon
+    - '/opt/homebrew/include/*.h'  # This will include all headers in the directory
 name: 'CassandraBindings'
-description: 'Bindings for the Cassandra C/C++ driver'
+description: 'Bindings for the Cassandra C API'
+comments: true  # Include comments from header files
+sort-by: name  # Sort outputs by name
+preamble: |
+  // Automatically generated bindings for Cassandra C API
+  // Run with: dart run ffigen
+silence-enum-warning: true
+# Explicitly include the functions you need
+functions:
+  include:
+    - 'cass_.*'  # Include all functions starting with 'cass_'
